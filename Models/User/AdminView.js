@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const messages = require("../../messages.json");
+const { sqlConnect } = require("../../dbConnection");
 
 async function signUpAdmin(req, res) {
   let admin = await Admin.findOne({ role: 1 });
@@ -63,26 +64,70 @@ async function logIn(req, res) {
     deleted: false,
   });
 
-  if (!admin)
-    return res
-      .status(404)
-      .send({ admin: null, message: messages.en.noUserFound });
+  await sqlConnect.query(
+    "SELECT * from admins where email=? AND deleted=0",
+    email.toLowerCase(),
+    async (err, rows) => {
+      if (err) throw err;
+      
+      if (!rows[0]) {
+        return res
+        .status(404)
+        .send({ admin: null, message: messages.en.noUserFound });
+      }
+      let userData = rows.map(({ID,_id,...rest}) => ({_id:ID,...rest}));
 
-  const validPassword = await bcrypt.compare(password, admin.password);
+      const validPassword = await bcrypt.compare(password, userData[0].password);
+      if (!validPassword) {
+        return res
+          .status(400)
+          .send({
+            unAutherized: true,
+            message: messages.en.invalidCredentials,
+          });
+      }
+      if (fcmToken) {
+        sqlConnect.query(
+          `UPDATE admins SET fcmToken = '${fcmToken}' WHERE ID = ${userData[0]._id}`
+        );
+        Admin.findOneAndUpdate(
+          { email: email.toLowerCase() },
+          { fcmToken: fcmToken }
+        );
+      }
 
-  if (!validPassword)
-    return res
-      .status(400)
-      .send({ unAutherized: true, message: messages.en.invalidCredentials });
+      return res
+        .status(200)
+        .send({ admin: userData[0], message: messages.en.loginSuccess });
+    }
+  );
 
-  if (fcmToken) {
-    admin.fcmToken = fcmToken;
-    await admin.save();
-  }
+  // let admin = await Admin.findOne({
+  //   email: email.toLowerCase(),
+  //   deleted: false,
+  // });
+  // console.log("=-=--=admin", admin);
 
-  return res
-    .status(200)
-    .send({ admin: admin, message: messages.en.loginSuccess });
+  // if (!admin)
+  //   return res
+  //     .status(404)
+  //     .send({ admin: null, message: messages.en.noUserFound });
+
+  // const validPassword = await bcrypt.compare(password, admin.password);
+
+  // if (!validPassword)
+  //   return res
+  //     .status(400)
+  //     .send({ unAutherized: true, message: messages.en.invalidCredentials });
+
+  // if (fcmToken) {
+  //   admin.fcmToken = fcmToken;
+  //   await admin.save();
+  // }
+
+  // return res
+  //   .status(200)
+  //   .send({ admin: admin, message: messages.en.loginSuccess });
 }
 
 async function getAdmins(req, res) {

@@ -5,6 +5,7 @@ const messages = require("../../messages.json");
 const CONF = require("../../constants");
 const AWS = require("aws-sdk");
 const fs = require("fs");
+const { sqlConnect } = require("../../dbConnection");
 
 const url = (folder, id, picture, event = false) => {
   if (!event)
@@ -189,13 +190,22 @@ async function createGuesthouse(req, res) {
 }
 
 async function getGuesthouses(req, res) {
-  const guesthouses = await Guesthouse.find({ deleted: false }).select(
-    "_id name urlName logo"
-  );
+  // const guesthouses = await Guesthouse.find({ deleted: false }).select(
+  //   "_id name urlName logo"
+  // );
 
-  return res
+  // return res
+  //   .status(200)
+  //   .send({ guestHouses: guesthouses, message: messages.en.getSuccess });
+
+  sqlConnect.query('SELECT ID,name,urlName,logo from guesthouses', (err, rows) => {
+    if(err) throw err;
+    let guesthouses = rows.map(({ID,...rest}) => ({_id:ID,...rest}));
+    return res
     .status(200)
-    .send({ guestHouses: guesthouses, message: messages.en.getSuccess });
+    .send({guestHouses: guesthouses, message: messages.en.getSuccess });
+  });
+
 }
 
 async function getGuesthouseById(req, res) {

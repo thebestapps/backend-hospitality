@@ -3,8 +3,22 @@ const mongodbUri = require("mongodb-uri");
 const Utils = require("./Utils");
 const environment = Utils.getEnvironment();
 const Fawn = require("fawn");
+const mysql = require('mysql');
 Fawn.init(mongoose);
 const task = Fawn.Task();
+
+const sqlConnect = mysql.createConnection({
+  host: environment.host,
+  user: environment.user,
+  password: environment.passwordSql,
+  database: environment.database,
+  
+})
+
+sqlConnect.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to MySQL s!');
+});
 
 async function connect(mongoose) {
   mongoose.Promise = global.Promise;
@@ -56,4 +70,7 @@ connect(mongoose)
     console.log("error cnx", log);
   });
 
-exports.task = task;
+module.exports = {
+  task,
+  sqlConnect
+};

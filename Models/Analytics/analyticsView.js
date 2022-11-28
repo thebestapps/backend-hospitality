@@ -99,7 +99,7 @@ async function getMonthlyRevenu(req, res) {
             parseInt(year)
       );
 
-      if (!nextMonth) {
+      if (nextMonth) {
         //Booking is on two month devide the amount on both
         amount = booking.totalPrice;
         response = response.filter((ele) => ele.month !== month.month);

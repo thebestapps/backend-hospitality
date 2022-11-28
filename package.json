@@ -23,6 +23,7 @@
     "mongodb-uri": "^0.9.7",
     "mongoose": "^5.11.15",
     "multer": "^1.4.4",
+    "mysql": "^2.18.1",
     "node-cron": "^3.0.0",
     "node-ical": "^0.12.8",
     "node-pre-gyp": "^0.16.0",
@@ -33,7 +34,7 @@
     "xlsx": "^0.15.6"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "name": "cheez-backend",
   "description": "",
@@ -44,5 +45,8 @@
     "url": "http://159.89.50.84/cheez/cheez-backend.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }

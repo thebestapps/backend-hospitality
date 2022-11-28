@@ -21,9 +21,9 @@ http.createServer(app).listen(3222, () => {
 });
 
 // Create an HTTPS service identical to the HTTP service.
-https.createServer(options, app).listen(configuration_variables.port, () => {
-  console.log("server listening on port:" + configuration_variables.port);
-});
+// https.createServer(options, app).listen(configuration_variables.port, () => {
+//   console.log("server listening on port:" + configuration_variables.port);
+// });
 
 //var server = app.listen(configuration_variables.port, function () {
 //  console.log(

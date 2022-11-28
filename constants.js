@@ -17,6 +17,10 @@ module.exports = {
   //},
 
   config_localhost: {
+    host: 'cheez-db.cluster-c2i1kaohxa2u.eu-central-1.rds.amazonaws.com',
+    user: 'cheez',
+    passwordSql: 'asnj4k34ncjn3#asd4',
+    database: 'cheez-app',
     port: 3200,
     server_address: "127.0.0.1",
     port_mongo: 27017,
